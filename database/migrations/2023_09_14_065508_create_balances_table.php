@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('balances', function (Blueprint $table) {
             $table->id();
             $table->foreignId("customer_id")->constrained();
-            $table->unsignedDecimal("balance", 9, 2)->nullable(false);
+            $table->unsignedDecimal("balance", 9, 2)->default(0.00);
             $table->timestamps();
         });
     }

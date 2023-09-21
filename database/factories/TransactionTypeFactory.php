@@ -17,7 +17,8 @@ class TransactionTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            ["transaction_type"=>"deposit"],
+            ["transaction_type"=>"withdraw"]
         ];
     }
 }

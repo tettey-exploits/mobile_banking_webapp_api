@@ -17,7 +17,14 @@ class PermissionFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            ["permission"=>"collect summary"],
+            ["permission"=>"manage account details"],
+            ["permission"=>"access all teller activities"],
+            ["permission"=>"take deposits"],
+            ["permission"=>"view deposits"],
+            ["permission"=>"access customers profiles"],
+            ["permission"=>"view customer profile"],
+            ["permission"=>"add new customer"]
         ];
     }
 }

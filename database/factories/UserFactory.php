@@ -21,7 +21,7 @@ class UserFactory extends Factory
         return [
             'first_name' => "backend",
             'last_name' => "dev",
-            'email' => Str::random(10).'@gmail.com',
+            'email' => 'backend_dev@gmail.com',
             'password' => Hash::make('password'),
         ];
     }

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Balance;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\TransactionType;
@@ -18,7 +19,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
-
+        $this->call([
+            UserSeeder::class,
+            BalanceSeeder::class,
+            PermissionSeeder::class,
+            RoleSeeder::class,
+            TransactionTypeSeeder::class,
+        ]);
     }
 }
