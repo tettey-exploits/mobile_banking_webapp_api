@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
 use App\Models\Transaction;
+use App\Models\TransactionType;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use function PHPUnit\Framework\throwException;
 
 class TransactionController extends Controller
 {
@@ -22,40 +25,48 @@ class TransactionController extends Controller
      */
     public function store(Request $request): ResponseResource
     {
+        try{
+            $customer = Customer::with("balance", "transactions")->find($request["customer_id"]);
+            $transaction_type = TransactionType::findOrFail($request["transaction_type_id"])->transaction_type;
+            $old_balance = $customer["balance"]["balance"];
+        }catch (ModelNotFoundException){
+            return ResponseResource::make([
+                "success" => false,
+                "message" => "Operation failed! Unknown transaction request.",
+                "data" => []
+            ]);
+        }
 
-        $balance_model = Customer::find($request->customer_id)->balance;
-        $old_balance = $balance_model->balance;
-
-        if($request->transaction_type_id == 1){ // 1 is deposit
-            $transaction_type = "deposit_amount";
-            $balance = $old_balance + $request->amount_ghs;
+        if($transaction_type == "deposit"){
+            $balance = $old_balance + $request["amount_ghs"];
             $message = "Cash deposited successfully";
-        }
-        else{
-            $transaction_type = "withdraw_amount";
-            $balance = $old_balance - $request->amount_ghs;
-            $message = "Cash withdrawn successfully";
-        }
-
-        if($balance < 0){
-            $success = false;
-            $message = "Balance is not enough to perform this operation!";
-            $balance = $old_balance;
-        }else{
-            $balance_model->balance = $balance;
-            $balance_model->save();
             $success = true;
 
             Transaction::create($request->all());
+            $customer["balance"]["balance"] = $balance;
+            $customer->save();
         }
+        else if($transaction_type == "withdraw"){
+            $balance = $old_balance - $request["amount_ghs"];
+            $message = "Cash withdrawn successfully";
+            $success = true;
 
+            if($balance < 0){
+                $success = false;
+                $message = "Transaction failed. Your balance is not enough!";
+                $balance = $old_balance;
+            }
+        }
 
         return ResponseResource::make([
             "success" => $success,
             "message" => $message,
-            $transaction_type => $request->amount_ghs,
-            "old_balance" => $old_balance,
-            "new_balance" => $balance
+            "data" => [
+                "transaction_type" => $transaction_type,
+                "amount_ghs" =>$request["amount_ghs"],
+                "old_balance" => $old_balance,
+                "new_balance" => $balance
+            ]
         ]);
     }
 

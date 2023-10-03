@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\ManageCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Balance;
@@ -19,7 +19,7 @@ class CustomerController extends Controller
      */
     public function index(): ResponseResource
     {
-        $customers = Customer::with("balance")->get();
+        $customers = Customer::with("balance")->paginate(25);
 
         return ResponseResource::make($customers);
     }
@@ -27,24 +27,38 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreCustomerRequest $request): ResponseResource
+    public function store(ManageCustomerRequest $request): ResponseResource
     {
+        try{ $account_number = date("dmy") . random_int(100000, 999999); }
+        catch (Exception){
+            return ResponseResource::make([
+                "success" => false,
+                "message" => "Could not generate relevant information. Please try again later",
+                "data" => []
+            ]);
+        }
 
         $new_customer_details = $request->merge([
-            'password' => Hash::make($request->password)
+            'password' => Hash::make($request["password"]),
+            "account_number" => $account_number
         ]);
 
         $new_customer = Customer::create($new_customer_details->all());
 
-        // Create an associated balance record
-        Balance::insert([
-            "customer_id"=>$new_customer->id,
-            "balance"=>0.00,
-            "created_at"=>now(),
-            "updated_at"=>now()
+        Balance::insert([  // Create an associated balance record
+            "customer_id" => $new_customer->id,
+            "balance" => 0.00,
+            "created_at" => now(),
+            "updated_at" => now()
         ]);
 
-        return ResponseResource::make($new_customer);
+        return ResponseResource::make([
+            "success" => true,
+            "message" => "Customer account created successfully.",
+            "data" => [
+                "new_customer" => $new_customer
+            ]
+        ]);
     }
 
     /**
@@ -52,21 +66,46 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer): ResponseResource
     {
-        $cus_data = Customer::with("balance")->where("id", $customer->id)->first();
-        return ResponseResource::make($cus_data);//->with("balance")-);
+        $customer->balance;
+        return ResponseResource::make([
+            "success" => true,
+            "data" => [
+                "customer_data" => $customer
+            ]
+        ]);
     }
 
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateCustomerRequest $request, Customer $customer)
+    public function update(ManageCustomerRequest $request, Customer $customer): ResponseResource
     {
-        //
-        return [
-            "request"=>$request,
-            "customer"=>$customer
-        ];
+        $customer["first_name"] = $request["first_name"];
+        $customer["last_name"] = $request["last_name"];
+        $customer["age"] = $request["age"];
+        $customer["contact"] = $request["contact"];
+        $customer["location"] = $request["location"];
+        $customer["email"] = $request["email"];
+
+        if($customer->update()){
+            return ResponseResource::make([
+                "success" => true,
+                "message" => "Customer records update successful",
+                "data" => [
+                    "customer_data"=> $customer
+                ]
+            ]);
+        }
+
+        return ResponseResource::make([
+            "success" => false,
+            "message" => "Customer records update failed",
+            "data" => [
+                "customer_data" => []
+            ]
+        ]);
+
     }
 
     /**
@@ -82,7 +121,7 @@ class CustomerController extends Controller
             $message = "Customer records successfully deleted";
         }catch (Exception $e){
             $success = false;
-            $message = $e->getMessage();
+            $message = "Could not delete customer records";
         }
 
 

@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string("first_name")->nullable(false)->index();
             $table->string("last_name")->nullable(false)->index();
-            $table->unsignedInteger("age")->nullable(false);
+            $table->date("date_of_birth")->nullable(false);
             $table->unsignedBigInteger("contact")->nullable(false)->unique();
+            $table->unsignedBigInteger("account_number")->nullable(false)->unique();
             $table->string("location")->nullable(false);
             $table->string("username")->unique();
             $table->string("email")->unique()->nullable();

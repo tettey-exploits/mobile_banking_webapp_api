@@ -21,11 +21,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 
-Route::withoutMiddleware("auth:sanctum")->group(function(){
-    Route::post('users/login', [AuthController::class, 'userLogin']);
-    Route::post('users/register', [UserController::class, 'store']);
-    Route::post("customers/login", [AuthController::class, 'customerLogin']);
-});
+Route::post('users/login', [AuthController::class, 'userLogin']);
+Route::post('users/register', [UserController::class, 'store']);
+Route::post("customers/login", [AuthController::class, 'customerLogin']);
 
 
 Route::middleware("auth:sanctum")->group( function(){
