@@ -22,14 +22,14 @@ class ManageCustomerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name'=>'required',
-            'last_name'=>'required',
-            'date_of_birth'=>'required|date',
-            'contact'=>'required|min:10',
-            'location'=>'required',
-            'email'=>'email',
-            'password'=>'required|min:8',
-            'device_name'=>'required'
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'date_of_birth' => 'required|date',
+            'contact' => 'required|min:10',
+            'location' => 'required',
+            'email' => 'email',
+            'password' => 'required|min:8',
+            'device_name' => 'required'
         ];
     }
 }

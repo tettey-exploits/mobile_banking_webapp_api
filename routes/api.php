@@ -3,10 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,11 +24,10 @@ Route::post('users/register', [UserController::class, 'store']);
 Route::post("customers/login", [AuthController::class, 'customerLogin']);
 
 
-Route::middleware("auth:sanctum")->group( function(){
+Route::middleware("auth:sanctum")->group(function () {
     Route::apiResource("/user", UserController::class);
     Route::apiResource("/customer", CustomerController::class);
     Route::apiResource("customer/balance", BalanceController::class);
 
     Route::apiResource("/transaction", TransactionController::class);
 });
-

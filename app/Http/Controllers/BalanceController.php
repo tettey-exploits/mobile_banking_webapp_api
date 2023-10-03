@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ResponseResource;
-use App\Models\Balance;
 use App\Models\Customer;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class BalanceController extends Controller
 {
@@ -37,7 +34,7 @@ class BalanceController extends Controller
         $success = false;
         $customer = Customer::where("account_number", $account_number)->first();
 
-        if($customer){
+        if($customer) {
             $data = $customer->balance;
             $success = true;
         }
