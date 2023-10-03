@@ -30,15 +30,23 @@ class BalanceController extends Controller
     /**$balance->customer()
      * Display the specified resource.
      */
-    public function show(string $id): ResponseResource
+    public function show(string $account_number): ResponseResource
     {
 
-        $customer = auth()->user();
-        $balance = $customer->balance;
+        $data = [];
+        $success = false;
+        $customer = Customer::where("account_number", $account_number)->first();
+
+        if($customer){
+            $data = $customer->balance;
+            $success = true;
+        }
 
         return ResponseResource::make([
-            "balance" => $balance
+            "success" => $success,
+            "data" => $data
         ]);
+
     }
 
     /**

@@ -16,47 +16,46 @@ class AuthController extends Controller
     //
     public function userLogin(): JsonResponse
     {
-        if (Auth::attempt(['email' => request('email'), 'password' => request('password')])) {
-            $user = User::find(Auth::user()->id);
-
-            $user_token['token'] = $user->createToken('appToken')->plainTextToken;
-
-            return response()->json([
-                'success' => true,
-                'token' => $user_token,
-                'user' => $user,
-            ], 200);
+        if (Auth::attempt(["email" => request("email"), "password" => request("password")])) {
+            $user = User::find(Auth::user()["id"]);
+            $user_token = $user->createToken("appToken")->plainTextToken;
+            $data = [
+                "user_data" => $user,
+                "token" => $user_token
+            ];
+            $success = true;
+            $message = "User authentication successful.";
+            $status = 200;
         } else {
-            // failure to authenticate
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to authenticate.',
-            ], 401);
+            $success = false;
+            $data = [];
+            $message = "User Authentication failed";
+            $status = 401;
+
         }
+
+        return response()->json([
+            "success" => $success,
+            "data" => $data,
+            "message" => $message,
+        ], $status);
     }
 
     public function customerLogin(Request $request): ResponseResource
     {
-        $request->validate([
-            'email'=>'required|email',
-            'password'=>'required',
-            'device_name'=>'required'
+        $customer = Customer::where('email', $request["email"])->first();
+
+        return !$customer || !Hash::check($request["password"], $customer->password) ? throw ValidationException::withMessages([
+            'email' => ['The provided email or password is incorrect.'],
+        ]) : ResponseResource::make([
+            'success' => true,
+            "data" => [
+                "customer_data" => $customer,
+                "token" => $customer->createToken($request["device_name"])->plainTextToken
+            ],
+
         ]);
 
-        $customer = Customer::where('email', $request->email)->first();
-
-        if (!$customer || !Hash::check($request->password, $customer->password)) {
-
-            throw ValidationException::withMessages([
-                'email' => ['The provided email or password is incorrect.'],
-            ]);
-        }
-
-        return ResponseResource::make([
-            'success'=>true,
-            "customer info"=> $customer,
-            "token"=> $customer->createToken($request->device_name)->plainTextToken
-        ]);
     }
 
 }

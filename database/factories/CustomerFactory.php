@@ -19,12 +19,15 @@ class CustomerFactory extends Factory
         return [
             "first_name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
-            "age" => $this->faker->numberBetween(18, 120),
+            "date_of_birth" => $this->faker->date( max: now()),
             "contact" => $this->faker->randomNumber(9),
+            "account_number" => date("dmy") . $this->faker->randomNumber(6),
             "location" => $this->faker->streetAddress(),
             "username" => $this->faker->userName(),
             "email" => $this->faker->email(),
-            "password" => $this->faker->password
+            "password" => $this->faker->password,
+            "created_at" => now(),
+            "updated_at" => now()
         ];
     }
 }
