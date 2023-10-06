@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ManageCustomerRequest;
-use App\Http\Requests\UpdateCustomerRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Balance;
 use App\Models\Customer;
 use Exception;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
@@ -29,8 +26,9 @@ class CustomerController extends Controller
      */
     public function store(ManageCustomerRequest $request): ResponseResource
     {
-        try{ $account_number = date("dmy") . random_int(100000, 999999); }
-        catch (Exception){
+        try {
+            $account_number = date("dmy") . random_int(100000, 999999);
+        } catch (Exception) {
             return ResponseResource::make([
                 "success" => false,
                 "message" => "Could not generate relevant information. Please try again later",
@@ -88,12 +86,12 @@ class CustomerController extends Controller
         $customer["location"] = $request["location"];
         $customer["email"] = $request["email"];
 
-        if($customer->update()){
+        if($customer->update()) {
             return ResponseResource::make([
                 "success" => true,
                 "message" => "Customer records update successful",
                 "data" => [
-                    "customer_data"=> $customer
+                    "customer_data" => $customer
                 ]
             ]);
         }
@@ -114,12 +112,12 @@ class CustomerController extends Controller
     public function destroy(Customer $customer): ResponseResource
     {
         try {
-            if($customer->balance->delete()){
+            if($customer->balance->delete()) {
                 $customer->delete();
             }
             $success = true;
             $message = "Customer records successfully deleted";
-        }catch (Exception $e){
+        } catch (Exception $e) {
             $success = false;
             $message = "Could not delete customer records";
         }

@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\Role;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,11 +18,11 @@ class RoleFactory extends Factory
     {
         return [
             //
-                ["role"=>"admin"],
-                ["role"=>"manager"],
-                ["role"=>"teller"],
-                ["role"=>"customer"],
-                ["role"=>"collector"]
+                ["role" => "admin"],
+                ["role" => "manager"],
+                ["role" => "teller"],
+                ["role" => "customer"],
+                ["role" => "collector"]
         ];
     }
 }

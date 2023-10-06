@@ -8,7 +8,6 @@ use App\Models\Transaction;
 use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
-use function PHPUnit\Framework\throwException;
 
 class TransactionController extends Controller
 {
@@ -25,11 +24,11 @@ class TransactionController extends Controller
      */
     public function store(Request $request): ResponseResource
     {
-        try{
+        try {
             $customer = Customer::with("balance", "transactions")->find($request["customer_id"]);
             $transaction_type = TransactionType::findOrFail($request["transaction_type_id"])->transaction_type;
             $old_balance = $customer["balance"]["balance"];
-        }catch (ModelNotFoundException){
+        } catch (ModelNotFoundException) {
             return ResponseResource::make([
                 "success" => false,
                 "message" => "Operation failed! Unknown transaction request.",
@@ -37,7 +36,7 @@ class TransactionController extends Controller
             ]);
         }
 
-        if($transaction_type == "deposit"){
+        if($transaction_type == "deposit") {
             $balance = $old_balance + $request["amount_ghs"];
             $message = "Cash deposited successfully";
             $success = true;
@@ -45,13 +44,12 @@ class TransactionController extends Controller
             Transaction::create($request->all());
             $customer["balance"]["balance"] = $balance;
             $customer->save();
-        }
-        else if($transaction_type == "withdraw"){
+        } elseif($transaction_type == "withdraw") {
             $balance = $old_balance - $request["amount_ghs"];
             $message = "Cash withdrawn successfully";
             $success = true;
 
-            if($balance < 0){
+            if($balance < 0) {
                 $success = false;
                 $message = "Transaction failed. Your balance is not enough!";
                 $balance = $old_balance;
@@ -63,7 +61,7 @@ class TransactionController extends Controller
             "message" => $message,
             "data" => [
                 "transaction_type" => $transaction_type,
-                "amount_ghs" =>$request["amount_ghs"],
+                "amount_ghs" => $request["amount_ghs"],
                 "old_balance" => $old_balance,
                 "new_balance" => $balance
             ]

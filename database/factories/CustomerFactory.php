@@ -19,7 +19,7 @@ class CustomerFactory extends Factory
         return [
             "first_name" => $this->faker->firstName(),
             "last_name" => $this->faker->lastName(),
-            "date_of_birth" => $this->faker->date( max: now()),
+            "date_of_birth" => $this->faker->date(max: now()),
             "contact" => $this->faker->randomNumber(9),
             "account_number" => date("dmy") . $this->faker->randomNumber(6),
             "location" => $this->faker->streetAddress(),

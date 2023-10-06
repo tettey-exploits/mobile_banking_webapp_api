@@ -63,7 +63,7 @@ class UserController extends Controller
             $user->delete();
             $success = true;
             $message = "Customer records successfully deleted";
-        }catch (Exception $e){
+        } catch (Exception $e) {
             $success = false;
             $message = $e->getMessage();
         }
