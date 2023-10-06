@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ResponseResource;
+use App\Models\Role;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -20,9 +21,21 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): ResponseResource
     {
         //
+        $new_user = User::create($request->all());
+        $role = Role::find($request->role_id);
+        $new_user->roles()->attach($role);
+
+        return ResponseResource::make([
+            "success" => true,
+            "message" => "New user added.",
+            "data" => [
+                "new_user" => $new_user
+            ]
+        ]);
+
     }
 
     /**
