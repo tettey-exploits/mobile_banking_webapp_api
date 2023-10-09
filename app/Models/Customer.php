@@ -33,6 +33,11 @@ class Customer extends Model
         'updated_at'
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return "account_number";
+    }
+
     public function balance(): HasOne
     {
         return $this->hasOne(Balance::class);
@@ -40,6 +45,6 @@ class Customer extends Model
 
     public function transactions(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Transaction::class, "customer_account_number");
     }
 }

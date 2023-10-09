@@ -11,7 +11,8 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'customer_id',
+        'user_id',
+        'customer_account_number',
         'transaction_type_id',
         'amount_ghs',
     ];
@@ -25,5 +26,10 @@ class Transaction extends Model
     public function transactiontype(): BelongsTo
     {
         return $this->belongsTo(TransactionType::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

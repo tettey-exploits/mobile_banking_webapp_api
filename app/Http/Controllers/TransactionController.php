@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TransactionController extends Controller
 {
@@ -16,7 +17,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -25,9 +26,9 @@ class TransactionController extends Controller
     public function store(Request $request): ResponseResource
     {
         try {
-            $customer = Customer::with("balance", "transactions")->find($request["customer_id"]);
+            $customer = Customer::with("balance")->find($request["account_number"]);
             $transaction_type = TransactionType::findOrFail($request["transaction_type_id"])->transaction_type;
-            $old_balance = $customer["balance"]["balance"];
+            $old_balance = $customer->balance->balance;
         } catch (ModelNotFoundException) {
             return ResponseResource::make([
                 "success" => false,
@@ -41,11 +42,10 @@ class TransactionController extends Controller
             $message = "Cash deposited successfully";
             $success = true;
 
-            Transaction::create($request->all());
-            $customer["balance"]["balance"] = $balance;
-            $customer->save();
+            Auth::user()->transactions->create([$request->all()]);
+            $customer->balance->create(["balance" => $balance]);
         } elseif($transaction_type == "withdraw") {
-            $balance = $old_balance - $request["amount_ghs"];
+            $balance = $old_balance - $request->amount_ghs;
             $message = "Cash withdrawn successfully";
             $success = true;
 
@@ -61,7 +61,7 @@ class TransactionController extends Controller
             "message" => $message,
             "data" => [
                 "transaction_type" => $transaction_type,
-                "amount_ghs" => $request["amount_ghs"],
+                "amount_ghs" => $request->amount_ghs,
                 "old_balance" => $old_balance,
                 "new_balance" => $balance
             ]
@@ -73,15 +73,6 @@ class TransactionController extends Controller
      */
     public function show(Transaction $transaction)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Transaction $transaction)
-    {
-        //
     }
 
     /**

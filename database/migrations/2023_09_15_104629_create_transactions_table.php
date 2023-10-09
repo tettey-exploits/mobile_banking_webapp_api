@@ -12,7 +12,8 @@ return new class () extends Migration {
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId("customer_id")->nullable(false);
+            $table->foreignId("customer_account_number")->nullable(false);
+            $table->foreignId("user_id")->nullable(false);
             $table->foreignId("transaction_type_id")->nullable(false);
             $table->decimal("amount_ghs", 9, 2)->nullable(false);
             $table->timestamps();

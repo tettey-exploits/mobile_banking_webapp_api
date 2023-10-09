@@ -64,7 +64,7 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer): ResponseResource
     {
-        $customer->balance;
+        $customer->load("balance");
         return ResponseResource::make([
             "success" => true,
             "data" => [
@@ -79,12 +79,12 @@ class CustomerController extends Controller
      */
     public function update(ManageCustomerRequest $request, Customer $customer): ResponseResource
     {
-        $customer["first_name"] = $request["first_name"];
-        $customer["last_name"] = $request["last_name"];
-        $customer["age"] = $request["age"];
-        $customer["contact"] = $request["contact"];
-        $customer["location"] = $request["location"];
-        $customer["email"] = $request["email"];
+        $customer["first_name"] = $request->first_nam;
+        $customer["last_name"] = $request->last_name;
+        $customer["date_of_birth"] = $request->date_of_birth;
+        $customer["contact"] = $request->contact;
+        $customer["location"] = $request->location;
+        $customer["email"] = $request->email;
 
         if($customer->update()) {
             return ResponseResource::make([
@@ -121,7 +121,6 @@ class CustomerController extends Controller
             $success = false;
             $message = "Could not delete customer records";
         }
-
 
         return ResponseResource::make([
             "success" => $success,
