@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\TransactionsRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
 use App\Models\Transaction;
@@ -9,6 +10,7 @@ use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TransactionController extends Controller
 {
@@ -23,27 +25,35 @@ class TransactionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): ResponseResource
+    public function store(TransactionsRequest $request): ResponseResource
     {
         try {
-            $customer = Customer::with("balance")->find($request["account_number"]);
-            $transaction_type = TransactionType::findOrFail($request["transaction_type_id"])->transaction_type;
+            $customer = Customer::with("balance")->where("account_number", $request["customer_account_number"])->first();
+            if($customer == Null)
+                throw new ModelNotFoundException;
+            $transaction_type = TransactionType::find($request["transaction_type_id"])->transaction_type;
             $old_balance = $customer->balance->balance;
-        } catch (ModelNotFoundException) {
+        } catch (ModelNotFoundException $exception) {
             return ResponseResource::make([
                 "success" => false,
-                "message" => "Operation failed! Unknown transaction request.",
+                "message" => "Customer with account number {$request["customer_account_number"]} does not exist",
                 "data" => []
             ]);
         }
 
         if($transaction_type == "deposit") {
-            $balance = $old_balance + $request["amount_ghs"];
+            $balance = $old_balance + $request->amount_ghs;
             $message = "Cash deposited successfully";
             $success = true;
 
-            Auth::user()->transactions->create([$request->all()]);
-            $customer->balance->create(["balance" => $balance]);
+            Transaction::create([
+                "user_id" => Auth::user()->id,
+                "customer_account_number" => $request->customer_account_number,
+                "amount_ghs" => $request->amount_ghs,
+                "transaction_type_id" => $request->transaction_type_id
+            ]);
+            $customer->balance->balance = $balance;
+            $customer->balance->save();
         } elseif($transaction_type == "withdraw") {
             $balance = $old_balance - $request->amount_ghs;
             $message = "Cash withdrawn successfully";
@@ -54,6 +64,9 @@ class TransactionController extends Controller
                 $message = "Transaction failed. Your balance is not enough!";
                 $balance = $old_balance;
             }
+
+            $customer->balance->balance = $balance;
+            $customer->balance->save();
         }
 
         return ResponseResource::make([

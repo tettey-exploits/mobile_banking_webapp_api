@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CustomerLoginRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
 use App\Models\User;
@@ -41,7 +42,7 @@ class AuthController extends Controller
         ], $status);
     }
 
-    public function customerLogin(Request $request): ResponseResource
+    public function customerLogin(CustomerLoginRequest $request): ResponseResource
     {
         $customer = Customer::where('email', $request["email"])->first();
 
