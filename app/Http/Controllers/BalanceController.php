@@ -2,34 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CustomerBalanceRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class BalanceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function show($account_number): ResponseResource
     {
-        //
-    }
-
-    /**$balance->customer()
-     * Display the specified resource.
-     */
-    public function show(string $account_number): ResponseResource
-    {
-
         $data = [];
         $success = false;
         $customer = Customer::where("account_number", $account_number)->first();
