@@ -3,8 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AssignPermissionController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
+use App\Models\Permission;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +30,6 @@ Route::middleware("auth:sanctum")->group(function () {
     Route::apiResource("/user", UserController::class);
     Route::apiResource("/customer", CustomerController::class);
     Route::apiResource("customer/balance", BalanceController::class);
-
     Route::apiResource("/transaction", TransactionController::class);
+    Route::apiResource("/permission", AssignPermissionController::class);
 });

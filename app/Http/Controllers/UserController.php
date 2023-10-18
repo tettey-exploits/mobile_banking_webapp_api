@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ManageUserRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Role;
 use App\Models\User;
@@ -21,11 +22,11 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): ResponseResource
+    public function store(ManageUserRequest $request): ResponseResource
     {
         //
         $new_user = User::create($request->all());
-        $role = Role::find($request->role_id);
+        $role = Role::find($request->role);
         $new_user->roles()->attach($role);
 
         return ResponseResource::make([
@@ -49,9 +50,48 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): ResponseResource
     {
         //
+        $update_resource = $request->update_resource;
+        $update_details = $request->update_details;
+
+        switch ($update_resource){
+            case "update_user_details":
+                $this->update_user_details($update_details, $user);
+                break;
+            case "update_user_password":
+                $this->update_user_password($update_details, $user);
+                break;
+            case "update_user_role":
+                $this->update_user_role($update_details, $user);
+                break;
+            default:
+                return ResponseResource::make([
+                    "success" => false,
+                    "message" => "Unknown resource request"
+                ]);
+        }
+
+        return ResponseResource::make([
+            "success" => true,
+            "message" => "Resource update successful"
+        ]);
+    }
+
+    public function update_user_details ($update_details, $user)
+    {
+
+    }
+
+    public function update_user_password ($update_details, $user)
+    {
+
+    }
+
+    private function update_user_role($update_details, $user): void
+    {
+        $user->roles()->attach($update_details["role_id"]);
     }
 
     /**

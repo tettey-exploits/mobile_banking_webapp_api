@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\CustomerBalanceRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
-use Illuminate\Http\Request;
 
 class BalanceController extends Controller
 {
@@ -28,19 +26,4 @@ class BalanceController extends Controller
 
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-
-    }
 }

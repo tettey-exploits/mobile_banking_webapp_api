@@ -6,7 +6,9 @@ use App\Http\Requests\ManageCustomerRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Balance;
 use App\Models\Customer;
+use App\Models\Role;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class CustomerController extends Controller
@@ -24,8 +26,13 @@ class CustomerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ManageCustomerRequest $request): ResponseResource
+    public function store(ManageCustomerRequest $request)//: ResponseResource
     {
+        if (Auth::user()->username != NULL)
+            abort(404);
+
+        $this->authorize("create", Customer::class);
+
         try {
             $account_number = date("dmy") . random_int(100000, 999999);
         } catch (Exception) {

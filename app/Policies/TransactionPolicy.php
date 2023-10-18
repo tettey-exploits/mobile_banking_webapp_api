@@ -2,12 +2,12 @@
 
 namespace App\Policies;
 
-use App\Models\Customer;
 use App\Models\Permission;
+use App\Models\Transaction;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Access\Response;
 
-class CustomerPolicy
+class TransactionPolicy
 {
     /**
      * Determine whether the user can view any models.
@@ -20,7 +20,7 @@ class CustomerPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Customer $customer): bool
+    public function view(User $user, Transaction $transaction): bool
     {
         //
     }
@@ -30,24 +30,30 @@ class CustomerPolicy
      */
     public function create(User $user): bool
     {
-        $permission = Permission::firstWhere("permission", "add new customer");
-        $allowed_roles = $permission->roles()->pluck("role");
         $is_allowed_access = false;
+        $permission = Permission::firstWhere("permission", "take deposits");
+        $allowed_roles = $permission->roles()->pluck("role");
+        $user_roles = $user->roles()->pluck("role");
 
-        foreach($user->roles as $role){
-            if($allowed_roles->contains($role->role)){
+        foreach($user_roles as $role){
+            if($allowed_roles->contains($role)){
                 $is_allowed_access = true;
                 break;
             }
         }
 
         return $is_allowed_access;
+
+//        if ($allowed_roles->contains($user_roles))
+//            return true;
+//        else
+//            return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Customer $customer): bool
+    public function update(User $user, Transaction $transaction): bool
     {
         //
     }
@@ -55,7 +61,7 @@ class CustomerPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Customer $customer): bool
+    public function delete(User $user, Transaction $transaction): bool
     {
         //
     }
@@ -63,7 +69,7 @@ class CustomerPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Customer $customer): bool
+    public function restore(User $user, Transaction $transaction): bool
     {
         //
     }
@@ -71,7 +77,7 @@ class CustomerPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Customer $customer): bool
+    public function forceDelete(User $user, Transaction $transaction): bool
     {
         //
     }

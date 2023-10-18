@@ -12,7 +12,7 @@ class Role extends Model
     public $timestamps = false;
 
 
-    public function permission(): BelongsToMany
+    public function permissions(): BelongsToMany
     {
         return $this->belongsToMany(Permission::class);
     }

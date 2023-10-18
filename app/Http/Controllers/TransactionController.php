@@ -5,21 +5,20 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TransactionsRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
+use App\Models\Permission;
 use App\Models\Transaction;
 use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-
 class TransactionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): ResponseResource
     {
-
+        $transactions = Transaction::with("customer")->paginate(25);
+        return ResponseResource::make($transactions);
     }
 
     /**
@@ -27,6 +26,12 @@ class TransactionController extends Controller
      */
     public function store(TransactionsRequest $request): ResponseResource
     {
+
+        if (Auth::user()->username != NULL) // Check if current user is not a customer
+            abort(404);
+
+        $this->authorize("create", Transaction::class);
+
         try {
             $customer = Customer::with("balance")->where("account_number", $request["customer_account_number"])->first();
             if($customer == Null)
