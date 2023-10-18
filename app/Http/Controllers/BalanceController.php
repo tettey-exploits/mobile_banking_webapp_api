@@ -6,6 +6,7 @@ use App\Http\Requests\CustomerBalanceRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BalanceController extends Controller
 {
