@@ -10,13 +10,9 @@ use App\Models\Transaction;
 use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
->>>>>>> Stashed changes
 
->>>>>>> Stashed changes
+
+
 class TransactionController extends Controller
 {
     /**
