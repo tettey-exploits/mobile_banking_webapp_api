@@ -22,7 +22,19 @@ class TransactionPolicy
      */
     public function view(User $user, Transaction $transaction): bool
     {
-        //
+        $is_allowed_access = false;
+        $permission = Permission::firstWhere("permission", "access customer profiles");
+        $allowed_roles = $permission->roles()->pluck("role");
+        $user_roles = $user->roles()->pluck("role");
+
+        foreach($user_roles as $role){
+            if($allowed_roles->contains($role)){
+                $is_allowed_access = true;
+                break;
+            }
+        }
+
+        return $is_allowed_access;
     }
 
     /**
@@ -44,10 +56,6 @@ class TransactionPolicy
 
         return $is_allowed_access;
 
-//        if ($allowed_roles->contains($user_roles))
-//            return true;
-//        else
-//            return false;
     }
 
     /**

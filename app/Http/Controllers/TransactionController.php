@@ -10,6 +10,13 @@ use App\Models\Transaction;
 use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+=======
+>>>>>>> Stashed changes
+
+>>>>>>> Stashed changes
 class TransactionController extends Controller
 {
     /**
@@ -46,58 +53,78 @@ class TransactionController extends Controller
             ]);
         }
 
-        if($transaction_type == "deposit") {
-            $balance = $old_balance + $request->amount_ghs;
-            $message = "Cash deposited successfully";
-            $success = true;
-
-            Transaction::create([
-                "user_id" => Auth::user()->id,
-                "customer_account_number" => $request->customer_account_number,
-                "amount_ghs" => $request->amount_ghs,
-                "transaction_type_id" => $request->transaction_type_id
-            ]);
-            $customer->balance->balance = $balance;
-            $customer->balance->save();
-        } elseif($transaction_type == "withdraw") {
-            $balance = $old_balance - $request->amount_ghs;
-            $message = "Cash withdrawn successfully";
-            $success = true;
-
-            if($balance < 0) {
-                $success = false;
-                $message = "Transaction failed. Your balance is not enough!";
-                $balance = $old_balance;
-            }
-
-            $customer->balance->balance = $balance;
-            $customer->balance->save();
+        if($transaction_type == "deposit")
+        {
+            $transaction_response = $this->makeDeposit($request, $customer);
+        }
+        elseif($transaction_type == "withdraw")
+        {
+            $transaction_response = $this->makeWithDrawal($request, $customer);
         }
 
         return ResponseResource::make([
-            "success" => $success,
-            "message" => $message,
+            "success" => $transaction_response["success"],
+            "message" => $transaction_response["message"],
             "data" => [
                 "transaction_type" => $transaction_type,
                 "amount_ghs" => $request->amount_ghs,
                 "old_balance" => $old_balance,
-                "new_balance" => $balance
+                "new_balance" => $transaction_response["balance"]
             ]
         ]);
+    }
+
+    private function makeDeposit($request, $customer): array
+    {
+
+        $old_balance = $customer->balance->balance;
+        $balance = $old_balance + $request->amount_ghs;
+
+        Transaction::create([
+            "user_id" => Auth::user()->id,
+            "customer_account_number" => $request->customer_account_number,
+            "amount_ghs" => $request->amount_ghs,
+            "transaction_type_id" => $request->transaction_type_id
+        ]);
+        $customer->balance->balance = $balance;
+        $customer->balance->save();
+
+        return [
+            "success" => true,
+            "message" => "Cash deposit successful",
+            "balance" => $balance
+        ];
+    }
+
+    private function makeWithDrawal($request, $customer): array
+    {
+        $old_balance = $customer->balance->balance;
+        $balance = $old_balance - $request->amount_ghs;
+        $message = "Cash withdrawn successfully";
+        $success = true;
+
+        if($balance < 0) {
+            $success = false;
+            $message = "Transaction failed. Your balance is not enough!";
+            $balance = $old_balance;
+        }
+
+        $customer->balance->balance = $balance;
+        $customer->balance->save();
+
+        return [
+            "success" => $success,
+            "message" => $message,
+            "balance" => $balance
+        ];
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show($account_number)
     {
+        return Transaction::where("customer_account_number", $account_number)->get();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Transaction $transaction)
-    {
-        //
-    }
 }

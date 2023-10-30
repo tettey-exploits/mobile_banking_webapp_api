@@ -7,7 +7,6 @@ use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
