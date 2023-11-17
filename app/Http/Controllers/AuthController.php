@@ -43,7 +43,7 @@ class AuthController extends Controller
 
     public function customerLogin(CustomerLoginRequest $request): ResponseResource
     {
-        $customer = Customer::where('email', $request["email"])->first();
+        $customer = Customer::where("username", $request->username)->first();
 
         return !$customer || !Hash::check($request["password"], $customer->password) ? throw ValidationException::withMessages([
             'email' => ['The provided email or password is incorrect.'],

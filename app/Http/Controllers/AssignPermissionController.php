@@ -15,9 +15,13 @@ class AssignPermissionController extends Controller
      */
     public function store(AssignPermissionRequest $request): ResponseResource
     {
-        //
-        $role = Role::find($request->role_id);
-        $role->permissions()->attach($request->permission_id);
+
+        $roles = Role::find($request->role_ids);
+
+        foreach ($roles as $role)
+        {
+            $role->permissions()->attach($request->permission_id);
+        }
 
         return ResponseResource::make([
             "success" => true,
