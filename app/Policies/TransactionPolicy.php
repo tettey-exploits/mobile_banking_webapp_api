@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Permission;
 use App\Models\Transaction;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TransactionPolicy
 {
@@ -27,8 +26,8 @@ class TransactionPolicy
         $allowed_roles = $permission->roles()->pluck("role");
         $user_roles = $user->roles()->pluck("role");
 
-        foreach($user_roles as $role){
-            if($allowed_roles->contains($role)){
+        foreach($user_roles as $role) {
+            if($allowed_roles->contains($role)) {
                 $is_allowed_access = true;
                 break;
             }
@@ -47,8 +46,8 @@ class TransactionPolicy
         $allowed_roles = $permission->roles()->pluck("role");
         $user_roles = $user->roles()->pluck("role");
 
-        foreach($user_roles as $role){
-            if($allowed_roles->contains($role)){
+        foreach($user_roles as $role) {
+            if($allowed_roles->contains($role)) {
                 $is_allowed_access = true;
                 break;
             }

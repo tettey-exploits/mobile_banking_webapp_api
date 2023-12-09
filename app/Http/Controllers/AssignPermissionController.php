@@ -6,7 +6,6 @@ use App\Http\Requests\AssignPermissionRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Http\Request;
 
 class AssignPermissionController extends Controller
 {
@@ -16,17 +15,20 @@ class AssignPermissionController extends Controller
     public function store(AssignPermissionRequest $request): ResponseResource
     {
 
-        $roles = Role::find($request->role_ids);
+        $role = Role::find($request->role_id);
 
-        foreach ($roles as $role)
-        {
-            $role->permissions()->attach($request->permission_id);
+        $result = $role->permissions()->syncWithoutDetaching($request->permission_ids);
+        if (empty($result["attached"])) {
+            $success = false;
+            $message = "Permissions already assigned to roles";
+        } else {
+            $success = true;
+            $message = "Permissions assigned to user";
         }
 
         return ResponseResource::make([
-            "success" => true,
-            "message" => "Permission assigned to user",
-            "assigned_permission" => Permission::find($request->permission_id)->permission
+            "success" => $success,
+            "message" => $message,
         ]);
     }
 

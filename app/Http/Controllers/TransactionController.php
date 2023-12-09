@@ -5,13 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TransactionsRequest;
 use App\Http\Resources\ResponseResource;
 use App\Models\Customer;
-use App\Models\Permission;
 use App\Models\Transaction;
 use App\Models\TransactionType;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
-
-
 
 class TransactionController extends Controller
 {
@@ -30,15 +27,17 @@ class TransactionController extends Controller
     public function store(TransactionsRequest $request): ResponseResource
     {
 
-        if (Auth::user()->username != NULL) // Check if current user is not a customer
+        if (Auth::user()->username != null) { // Check if current user is not a customer
             abort(404);
+        }
 
         $this->authorize("create", Transaction::class);
 
         try {
             $customer = Customer::with("balance")->where("account_number", $request["customer_account_number"])->first();
-            if($customer == Null)
-                throw new ModelNotFoundException;
+            if($customer == null) {
+                throw new ModelNotFoundException();
+            }
             $transaction_type = TransactionType::find($request["transaction_type_id"])->transaction_type;
             $old_balance = $customer->balance->balance;
         } catch (ModelNotFoundException $exception) {
@@ -49,12 +48,9 @@ class TransactionController extends Controller
             ]);
         }
 
-        if($transaction_type == "deposit")
-        {
+        if($transaction_type == "deposit") {
             $transaction_response = $this->makeDeposit($request, $customer);
-        }
-        elseif($transaction_type == "withdraw")
-        {
+        } elseif($transaction_type == "withdraw") {
             $transaction_response = $this->makeWithDrawal($request, $customer);
         }
 

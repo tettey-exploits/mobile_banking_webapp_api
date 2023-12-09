@@ -22,7 +22,7 @@ class TransactionsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "customer_account_number" => "required|numeric|digits:12",
+            "customer_account_number" => "required|numeric",
             "transaction_type_id" => "required|digits:1|digits_between:1,2",
             "amount_ghs" => "required|numeric|min:0"
         ];
