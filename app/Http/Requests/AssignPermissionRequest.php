@@ -23,7 +23,8 @@ class AssignPermissionRequest extends FormRequest
     {
         return [
             "role_id" => "required|integer",
-            "permission_ids" => "required|array"
+            "permission_ids" => "required|array",
+            "action" => "required|in:" . implode(',', ['attach','detach'])
         ];
     }
 }

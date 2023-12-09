@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignPermissionRequest;
 use App\Http\Resources\ResponseResource;
-use App\Models\Permission;
 use App\Models\Role;
 
 class AssignPermissionController extends Controller
@@ -14,16 +13,22 @@ class AssignPermissionController extends Controller
      */
     public function store(AssignPermissionRequest $request): ResponseResource
     {
-
         $role = Role::find($request->role_id);
+        $action = $request->action;
 
-        $result = $role->permissions()->syncWithoutDetaching($request->permission_ids);
-        if (empty($result["attached"])) {
-            $success = false;
-            $message = "Permissions already assigned to roles";
+        if ($action == "attach") {
+            $result = $role->permissions()->syncWithoutDetaching($request->permission_ids);
+            if (empty($result["attached"])) {
+                $success = false;
+                $message = "Permissions already assigned to roles";
+            } else {
+                $success = true;
+                $message = "Permissions assigned to user";
+            }
         } else {
-            $success = true;
-            $message = "Permissions assigned to user";
+            $num = $role->permissions()->detach($request->permission_ids);
+            $message = "$num permissions successfully revoked";
+            $success = $num > 0;
         }
 
         return ResponseResource::make([
